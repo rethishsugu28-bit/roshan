@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Student Grade Calculator</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* --- COLOR PALETTE --- */
+:root {
+    --color-primary: #673AB7; /* Deep Purple */
+    --color-secondary: #00BCD4; /* Cyan/Aqua Accent */
+    --color-background: #F3E5F5; /* Light Lavender Background */
+    --color-card-bg: #FFFFFF;
+    --color-text-dark: #212121;
+    --color-text-light: #FFFFFF;
+    --color-success: #4CAF50;
+    --color-fail: #F44336;
+}
+
+/* --- BASE STYLES --- */
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    background: var(--color-background); 
+    color: var(--color-text-dark);
+}
+
+.container { 
+    max-width: 800px; 
+    margin: 30px auto; 
+    padding: 30px; 
+    background: var(--color-card-bg); 
+    border-radius: 15px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+}
+
+/* --- HEADER & NAVIGATION --- */
+header { 
+    background: var(--color-primary); 
+    color: var(--color-text-light); 
+    padding: 20px; 
+    text-align: center; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+nav a { 
+    color: var(--color-text-light); 
+    margin: 0 15px; 
+    text-decoration: none; 
+    font-weight: 600; 
+    font-size: 16px; 
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    cursor: pointer; 
+}
+
+nav a:hover, nav a.active { 
+    background: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+
+/* --- TYPOGRAPHY --- */
+h1, h2 { 
+    color: var(--color-primary); 
+    font-weight: 700;
+}
+
+h1 { font-size: 32px; margin-bottom: 10px; }
+h2 { font-size: 26px; margin-bottom: 25px; border-bottom: 2px solid var(--color-secondary); padding-bottom: 10px; }
+
+/* --- FORMS & INPUTS --- */
+label { 
+    display: flex; 
+    align-items: center;
+    margin-top: 20px; 
+    font-weight: 600; 
+    font-size: 15px; 
+    color: var(--color-text-dark);
+}
+label i {
+    font-size: 18px;
+    margin-right: 8px;
+    color: var(--color-secondary);
+}
+
+input, textarea { 
+    width: 100%; 
+    padding: 12px; 
+    margin-top: 8px; 
+    border: 2px solid #ddd; 
+    border-radius: 8px; 
+    font-size: 15px; 
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+input:focus, textarea:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 5px rgba(0, 188, 212, 0.5);
+    outline: none;
+}
+textarea { resize: vertical; }
+
+
+/* --- BUTTONS --- */
+button { 
+    padding: 12px 25px; 
+    margin-top: 20px; 
+    background-color: var(--color-primary); 
+    color: var(--color-text-light); 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 16px; 
+    cursor: pointer; 
+    transition: background 0.3s, transform 0.1s; 
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+button:hover { 
+    background-color: #512DA8; /* Darker Purple */
+    transform: translateY(-2px);
+}
+button:active {
+    transform: translateY(0);
+}
+
+/* --- RESULT BOX --- */
+#resultBox { 
+    margin-top: 30px; 
+    background: #E1BEE7; /* Light Purple for accent */
+    border: 2px solid var(--color-primary);
+    padding: 25px; 
+    border-radius: 10px; 
+    font-size: 1.1rem; 
+    line-height: 1.8; 
+    font-weight: 500;
+    transition: background-color 0.5s;
+}
+
+.pass { color: var(--color-success); font-weight: bold; }
+.fail { color: var(--color-fail); font-weight: bold; }
+
+/* --- OTHER ELEMENTS --- */
+ul {
+    padding-left: 20px;
+    list-style-type: '👉 ';
+}
+li {
+    margin-bottom: 10px;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* Hidden display */
+section { display: none; }
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .container {
+        margin: 15px;
+        padding: 20px;
+    }
+    nav a {
+        display: block;
+        margin: 5px 0;
+    }
+    .hero-text {
+        font-size: 1.1rem;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a id="nav-home" class="active" onclick="showPage('home')">Home</a>
+    <a id="nav-calculator" onclick="showPage('calculator')">Calculator</a>
+    <a id="nav-about" onclick="showPage('about')">Grading System</a>
+    <a id="nav-contact" onclick="showPage('contact')">Contact</a>
+  </nav>
+</header>
+
+<div id="loginPage" class="container" style="display:flex; flex-direction:column; align-items:center;">
+  <h2 style="margin-bottom: 20px;">Student Login</h2>
+  <form onsubmit="login(event)" style="width:100%; max-width:400px;">
+    <label for="regNo"><i class="material-icons">fingerprint</i>Registration Number</label>
+    <input type="text" id="regNo" placeholder="Enter registration number" required />
+    <label for="dob"><i class="material-icons">calendar_today</i>Date of Birth</label>
+    <input type="date" id="dob" required />
+    <button type="submit" style="width:100%;">Login</button>
+  </form>
+  <div id="loginMsg" style="margin-top:20px; font-weight:bold;"></div>
+</div>
+
+<div id="mainContent" style="display:none;">
+    <div class="container">
+      
+            <section id="home">
+        <h1 id="welcomeHome"></h1>
+        <p class="hero-text" style="font-size: 1.2rem; margin-top: 20px; font-weight: 300;">
+            <span style="color: var(--color-secondary); font-weight: 600;">NEHRU INSTITUTE OF TECHNOLOGY,</span>
+            <br> CYBER SECURITY DEPARTMENT
+        </p>
+        <p>This application allows you to **calculate your potential subject grades** and understand the university's grading distribution based on your marks.</p>
+      </section>
+
+            <section id="calculator">
+        <h2>Subject Grade Calculator</h2>
+
+        <label for="heritageTamil"><i class="material-icons">book</i>Heritage of Tamil (0-100):</label>
+        <input type="number" id="heritageTamil" min="0" max="100" />
+
+        <label for="effectiveEnglish"><i class="material-icons">spellcheck</i>Effective English for Engineers (0-100):</label>
+        <input type="number" id="effectiveEnglish" min="0" max="100" />
+
+        <label for="webApp"><i class="material-icons">code</i>Introduction to Web Applications (0-100):</label>
+        <input type="number" id="webApp" min="0" max="100" />
+
+        <label for="cProgramming"><i class="material-icons">devices</i>C Programming (0-100):</label>
+        <input type="number" id="cProgramming" min="0" max="100" />
+
+        <label for="calculus"><i class="material-icons">functions</i>Calculus for Engineers (0-100):</label>
+        <input type="number" id="calculus" min="0" max="100" />
+
+        <label for="physicsInfoSci"><i class="material-icons">science</i>Physics for Information Science (0-100):</label>
+        <input type="number" id="physicsInfoSci" min="0" max="100" />
+
+        <div style="display:flex; gap:15px; margin-top:30px;">
+          <button onclick="calculateGrade()">Calculate Grades</button>
+          <button onclick="resetFields()" style="background-color: #7986CB;">Reset</button>
+        </div>
+        <div id="resultBox">Enter your marks to see the result here.</div>
+      </section>
+
+            <section id="about">
+        <h2>University Grading System</h2>
+        <p style="font-style: italic;">Grades are based on your overall percentage calculated from a maximum of 600 marks.</p>
+        <ul>
+          <li>**90% and above** : A+ (Outstanding)</li>
+          <li>**80% to 89%** : A (Excellent)</li>
+          <li>**70% to 79%** : B+ (Very Good)</li>
+          <li>**60% to 69%** : B (Good)</li>
+          <li>**50% to 59%** : C (Average)</li>
+          <li>**40% to 49%** : D (Pass)</li>
+          <li>**Below 40%** : Fail (Re-appear)</li>
+        </ul>
+      </section>
+
+            <section id="contact">
+        <h2>Get in Touch</h2>
+        <form onsubmit="submitForm(event)">
+          <label for="name"><i class="material-icons">person</i>Name:</label>
+          <input type="text" id="name" required />
+          <label for="email"><i class="material-icons">mail</i>Email:</label>
+          <input type="email" id="email" required />
+          <label for="message"><i class="material-icons">message</i>Message:</label>
+          <textarea id="message" rows="4" required></textarea>
+          <button type="submit" style="width:100%; margin-top:20px;">Send Message</button>
+        </form>
+        <div id="responseMsg" style="margin-top:20px; font-weight:bold;"></div>
+
+        <h3 style="color: var(--color-secondary); font-size: 1.2rem; margin-top: 40px;">Direct Contacts</h3>
+        <p><i class="material-icons" style="font-size: 16px; margin-right: 5px; vertical-align: middle;">email</i> Email: <a href="mailto:project10nitcyber@gmail.com">project10nitcyber@gmail.com</a></p>
+        <p><i class="material-icons" style="font-size: 16px; margin-right: 5px; vertical-align: middle;">phone</i> Phone: <a href="tel:+918344458456">8344458456</a></p>
+        <p><i class="material-icons" style="font-size: 16px; margin-right: 5px; vertical-align: middle;">chat</i> WhatsApp: <a href="https://wa.me/918903837127" target="_blank" rel="noopener">8903837127</a></p>
+      </section>
+    </div>
+</div>
+
+<script>
+  const studentData = {
+    '20256708': { name: 'Soniya Kumari.R.N', dob: '2007-12-07' },
+    '20250360': { name: 'Shriram.P', dob: '2008-04-14' },
+    '20250406': { name: 'Bhuvaneswari.S', dob: '2007-12-15' },
+    '20253646': { name: 'Sravan.P.V', dob: '2007-07-19' },
+    '20256387': { name: 'Selvam.R', dob: '2008-08-30' },
+    '20251003': { name: 'Vishnu Prasad.N', dob: '2007-02-03' },
+    '20256796': { name: 'Sharafath Roshan.S', dob: '2007-12-08' }
+  };
+
+  let blinkInterval = null;
+  
+  // Runs when the page loads to set the initial view
+  document.addEventListener('DOMContentLoaded', () => {
+    // Show the login page by default
+    document.getElementById('loginPage').style.display = 'flex';
+  });
+
+
+  function showPage(pageId) {
+    if (document.getElementById('mainContent').style.display === 'none') {
+        // Prevent navigation if not logged in
+        return; 
+    }
+    
+    document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
+    document.getElementById('nav-' + pageId).classList.add('active');
+    document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+    document.getElementById(pageId).style.display = 'block';
+    
+    // Stop blinking if user navigates away from the calculator
+    if (pageId !== 'calculator') {
+        stopBlinking(document.getElementById('resultBox'));
+        document.getElementById('resultBox').style.backgroundColor = '#E1BEE7';
+    }
+  }
+
+  function login(e) {
+    e.preventDefault();
+    const regNo = document.getElementById('regNo').value.trim();
+    const dob = document.getElementById('dob').value;
+    const student = studentData[regNo];
+    const loginMsg = document.getElementById('loginMsg');
+    
+    // Check if student exists AND DOB matches
+    if (student && student.dob === dob) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('welcomeHome').innerText = `Welcome, ${student.name}!`;
+      showPage('home');
+      loginMsg.innerText = 'Login Successful!';
+      loginMsg.style.color = 'var(--color-success)';
+    } else {
+      loginMsg.innerText = 'Invalid Registration Number or Date of Birth.';
+      loginMsg.style.color = 'var(--color-fail)';
+    }
+  }
+
+  function calculateGrade() {
+    const heritageTamil = parseFloat(document.getElementById('heritageTamil').value) || 0;
+    const effectiveEnglish = parseFloat(document.getElementById('effectiveEnglish').value) || 0;
+    const webApp = parseFloat(document.getElementById('webApp').value) || 0;
+    const cProgramming = parseFloat(document.getElementById('cProgramming').value) || 0;
+    const calculus = parseFloat(document.getElementById('calculus').value) || 0;
+    const physicsInfoSci = parseFloat(document.getElementById('physicsInfoSci').value) || 0;
+
+    // Input Validation: Check if any input is outside the 0-100 range
+    if (
+        heritageTamil < 0 || heritageTamil > 100 ||
+        effectiveEnglish < 0 || effectiveEnglish > 100 ||
+        webApp < 0 || webApp > 100 ||
+        cProgramming < 0 || cProgramming > 100 ||
+        calculus < 0 || calculus > 100 ||
+        physicsInfoSci < 0 || physicsInfoSci > 100
+    ) {
+        document.getElementById('resultBox').innerHTML = `<i class="material-icons" style="vertical-align: middle; color: var(--color-fail);">error_outline</i> <span class="fail">Error: Marks must be between 0 and 100.</span>`;
+        document.getElementById('resultBox').style.backgroundColor = '#F8BBD0';
+        stopBlinking(document.getElementById('resultBox'));
+        return;
+    }
+
+
+    const total = heritageTamil + effectiveEnglish + webApp + cProgramming + calculus + physicsInfoSci;
+    const percentage = (total / 600) * 100;
+
+    let grade = '';
+    if (percentage >= 90) grade = 'A+';
+    else if (percentage >= 80) grade = 'A';
+    else if (percentage >= 70) grade = 'B+';
+    else if (percentage >= 60) grade = 'B';
+    else if (percentage >= 50) grade = 'C';
+    else if (percentage >= 40) grade = 'D';
+    else grade = 'Fail';
+
+    let status = (grade !== 'Fail') ? '<span class="pass">Congratulations! You Passed.</span>' : '<span class="fail">Sorry, You Failed.</span>';
+    const resultDiv = document.getElementById('resultBox');
+    
+    // Result HTML with bolding and icons
+    resultDiv.innerHTML = 
+      `**Total Marks:** ${total.toFixed(0)} / 600<br>
+       **Percentage:** ${percentage.toFixed(2)}%<br>
+       **Final Grade:** <span style="color: var(--color-primary); font-size: 1.2rem; background-color: #EDE7F6; padding: 3px 8px; border-radius: 5px;">${grade}</span><br>
+       **Status:** ${status}`;
+
+    if (grade !== 'Fail') {
+      startBlinking(resultDiv, '#C8E6C9'); // Light Green for pass
+    } else {
+      startBlinking(resultDiv, '#FFCDD2'); // Light Red for fail
+    }
+  }
+
+  function startBlinking(element, color) {
+    stopBlinking(element);
+    let visible = true;
+    let blinkCount = 0;
+    const maxBlinks = 8; 
+
+    element.style.backgroundColor = color;
+
+    blinkInterval = setInterval(() => {
+      element.style.visibility = visible ? 'hidden' : 'visible';
+      visible = !visible;
+      blinkCount++;
+      if (blinkCount >= maxBlinks) {
+        clearInterval(blinkInterval);
+        element.style.visibility = 'visible';
+      }
+    }, 250); 
+  }
+
+  function stopBlinking(element) {
+    clearInterval(blinkInterval);
+    element.style.visibility = 'visible';
+  }
+
+  function resetFields() {
+    ['heritageTamil', 'effectiveEnglish', 'webApp', 'cProgramming', 'calculus', 'physicsInfoSci']
+      .forEach(id => document.getElementById(id).value = '');
+    stopBlinking(document.getElementById('resultBox'));
+    document.getElementById('resultBox').innerHTML = 'Enter your marks to see the result here.';
+    document.getElementById('resultBox').style.backgroundColor = '#E1BEE7';
+  }
+
+  function submitForm(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    document.getElementById('responseMsg').innerText = `Thank you, ${name}. Your message has been received! We will be in touch soon.`;
+    document.getElementById('responseMsg').style.color = 'var(--color-success)';
+    e.target.reset();
+  }
+</script>
+
+</body>
+</html>
